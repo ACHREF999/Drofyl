@@ -5,6 +5,7 @@
   --foreground: #171717;
 }
 
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -18,9 +19,14 @@
     --foreground: #ededed;
   }
 }
+body{
+  background: var(--background);
+  background-image: url("/pattern (3).svg")
+}
 
+/*
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-}
+} */
