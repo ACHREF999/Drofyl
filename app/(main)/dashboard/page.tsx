@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import {PieChart} from '@mui/x-charts/PieChart';
 import {BarChart} from '@mui/x-charts/BarChart';
+import Link from 'next/link'
 
 
 function Dashboard() {
@@ -31,9 +32,9 @@ function Dashboard() {
 
   if(!isSignedIn){
     return (
-      <a href="/sign-in"> 
+      <Link href="/sign-in"> 
         You Need To sign in
-      </a>
+      </Link>
     );
   }
   console.log(data)
@@ -81,7 +82,7 @@ function Dashboard() {
                   </h1>
                   <p className="text-gray-500 text-sm">
                     {/*  */}
-                    {/* @ts-expect-error */}
+                    {/* @ts-expect-error number thing */}
                     You have {(1 -  data.totalSize/(5*1024*1024*1024)).toFixed(4) * 100}% left in your storage.
                   </p>
                 </div>
@@ -173,12 +174,9 @@ function Dashboard() {
             fontSize: 16,
             fill: 'white',
           },
-          lineStyle: {
-            stroke: 'white',
-          },
-          tickLineStyle: {
-            stroke: 'white',
-          },
+          // ts-expect-error
+          
+          
         },
       ]}
       yAxis={[
@@ -201,12 +199,13 @@ function Dashboard() {
             textOrientation:'sideways',
             marginRight:10,
           },
-          lineStyle: {
-            stroke: 'white',
-          },
-          tickLineStyle: {
-            stroke: 'white',
-          },
+          // ts-expect-error
+          // lineStyle: {
+          //   stroke: 'white',
+          // },
+          // tickLineStyle: {
+          //   stroke: 'white',
+          // },
         },
       ]}
       series={[
@@ -216,7 +215,7 @@ function Dashboard() {
       ]}
       height={400}
       width={600}
-      padding={{left:100}}
+      // padding={{left:100}}
       margin={{ top: 20, bottom: 40, left: 20, right: 20 }} // ⬅️ this prevents label truncation
       slotProps={{
         tooltip:{

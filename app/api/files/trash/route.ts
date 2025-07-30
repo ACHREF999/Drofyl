@@ -34,7 +34,9 @@ export async function GET(request: NextRequest) {
                     eq(files.isFolder,true)
                 )
             )
-
+            if(!parent){
+                throw new Error('INVALIDE ParentId')
+            }
             result = await db.select().from(files).where(
                 and(
                     eq(files.userId,userId),

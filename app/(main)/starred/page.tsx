@@ -7,7 +7,7 @@ import {fetcher} from '@/lib/fetcher';
 import { Folder,File,Star,Trash, LoaderCircle } from 'lucide-react';
 import axios from 'axios';
 import {mutate} from 'swr';
-import {useSearchParams,useRouter} from 'next/navigation'
+import {useRouter} from 'next/navigation'
 
 
 function Starred() {
@@ -15,13 +15,12 @@ function Starred() {
     const {data,error,isLoading:isDataLoading} = useSWR('http://localhost:3000/api/files/starred/',fetcher)
     const [isLoading,setIsLoading] = useState(false)
 
-    const params = useSearchParams();
-        const currentParent = params.get('parentId') || null;
-        const router = useRouter()
-        // const token = Auth.getToken();
-        // const [currentFolder,setCurrentFolder] = useState(null)
-        // const {currentParent,currentPath,setCurrentParent} : any = useCurrentParent()
-    
+    // const params = useSearchParams();
+    const router = useRouter()
+    // const token = Auth.getToken();
+    // const [currentFolder,setCurrentFolder] = useState(null)
+    // const {currentParent,currentPath,setCurrentParent} : any = useCurrentParent()
+
     const onDoubleClick = (parentId:string|null)=>{
         if(parentId){
             router.push(`/all?parentId=${parentId}`)
@@ -33,7 +32,7 @@ function Starred() {
     const handleStar = async (fileId:string)=>{
         try{
             setIsLoading(true)
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/files/${fileId}/star`
             )
 
@@ -57,7 +56,7 @@ function Starred() {
 
         try{
             setIsLoading(false)
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/files/${fileId}/trash`
             )
             const filterFunction = (key:string)=>{
@@ -106,18 +105,18 @@ function Starred() {
                 </span>
             )}
             {(!isDataLoading && !error && data?.result?.length>0 ) ? (<div className="flex flex-col gap-2">
-                {data.result.map((item:any) =>{
+                {data.result.map((item:{id:string,isFolder:boolean,name:string,isStarred:boolean,fileUrl:string}) =>{
                     if(item.isFolder) {
                         return (
-                            <div className="bg-gray-950/50 p-2 rounded-md border border-gray-400 flex justify-between items-center w-full" key={item.id} onDoubleClick={e=>onDoubleClick(item.id)} >
+                            <div className="bg-gray-950/50 p-2 rounded-md border border-gray-400 flex justify-between items-center w-full" key={item.id} onDoubleClick={()=>onDoubleClick(item.id)} >
                                 <div className="flex flex-row items-center gap-1">
                                     <Folder />
                                     {item.name}
                                 </div>
 
                                 <div className="flex flex-row gap-1">
-                                <Star  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `} fill={item.isStarred?' gold ':''} onClick={e=>handleStar(item.id)}/>
-                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={e=>handleTrash(item.id)}/>
+                                <Star  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `} fill={item.isStarred?' gold ':''} onClick={()=>handleStar(item.id)}/>
+                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={()=>handleTrash(item.id)}/>
                                 </div>
                             </div>
                         )

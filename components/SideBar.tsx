@@ -5,6 +5,7 @@ import { Divider } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Folders, LayoutDashboard, List, Minus ,Settings,Star, Trash, User} from "lucide-react";
 import { useState } from "react";
+import Image from 'next/image';
 
 
 
@@ -13,12 +14,12 @@ import { useState } from "react";
 export default function SideBar(){
     const pathname = usePathname()
     const [collapsedFolders, setCollapsedFolders] = useState(true) 
-    const {user,isSignedIn,isLoaded} = useUser()
+    const {user} = useUser()
     // console.log(user)
 
     // console.log(pathname)
 
-    const ActiveLink = ({href,children}:any)=>{
+    const ActiveLink = ({href,children}:{href:string,children:React.ReactNode})=>{
         return (
             <Link 
             href={href}
@@ -35,8 +36,10 @@ export default function SideBar(){
             {/* TOP */}
             <div>
             <div className="flex flex-row px-2 gap-2 items-center hover:bg-[#343434]  rounded-md transition-all my-4 py-2 cursor-default">
-                <div className="w-10 h-10 bg-blue-300 rounded-md">
-                </div>
+
+                { user?.hasImage ? (<Image src={user?.imageUrl} width={96} height={96} alt="User Avatar" className="w-10 h-10 rounded-md border-1 border-gray-400/30 shadow-md shadow-gray-500" />):(<div className="w-10 h-10 bg-blue-300 rounded-md">
+                </div>)}
+                
                 <div className="flex flex-col items-start">
                     <h1 className="text-white font-semibold text-md">
                         {user?.primaryEmailAddress?.emailAddress.split('@')[0]} Storage

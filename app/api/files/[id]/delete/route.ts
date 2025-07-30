@@ -4,6 +4,7 @@ import {files} from '@/lib/schema';
 import db from '@/lib';
 import {and, AnyColumn, eq, inArray, sql } from 'drizzle-orm';
 import ImageKit from 'imagekit';
+// import type {User} from '@clerk/nextjs/server'
 
 const imageKit = new ImageKit({
     publicKey:process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY||"",
@@ -11,23 +12,22 @@ const imageKit = new ImageKit({
     urlEndpoint : process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT|| ""
 })
 
-const recursiveIds = async (fileId:string,user:any)=>{
+const recursiveIds = async (fileId:string,user:{userId:string})=>{
     
-    let ids :string[]= []
     let currentIds :string[]= []
     let nextIds :string[] = [fileId]
     let imagekitIds : string[] = []
     while(nextIds.length>0){
         currentIds =  [ ...currentIds,...nextIds]
-        let tempIds : string[] = []
-        for (let id of nextIds){
+        const tempIds : string[] = []
+        for (const id of nextIds){
             const children = await db.select().from(files).where(
                 and(
                     eq(files.parentId,id),
                     eq(files.userId,user.userId),
                 )
             )
-            for (let child of children){
+            for (const child of children){
                 tempIds.push(child.id)
                 if(!child.isFolder){
                     imagekitIds = [...imagekitIds,child.fileId as string]

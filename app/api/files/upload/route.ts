@@ -1,10 +1,10 @@
 import {auth} from '@clerk/nextjs/server';
 import  { NextRequest,NextResponse } from 'next/server'
-import {files,File as FileType} from '@/lib/schema'
+import {files,} from '@/lib/schema'
 import db from '@/lib/';
 import {v4 as uuidv4} from 'uuid'
 import ImageKit from 'imagekit'
-import {and , eq } from 'drizzle-orm';
+import {and , eq, InferModel } from 'drizzle-orm';
 
 
 const imagekit = new ImageKit({
@@ -35,7 +35,8 @@ export async function POST(request:NextRequest){
         if(!file){
             return NextResponse.json({error:"BAD REQUEST"},{status:403})
         }
-        let parent :any;
+        type FileRecord = InferModel<typeof files>
+        let parent :FileRecord;
         if(parentId){
             [parent] = await db.select().from(files).where(
                 and(

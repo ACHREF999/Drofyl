@@ -1,23 +1,21 @@
 'use client'
-import { Divider ,Button,Input} from '@heroui/react'
+import { Divider ,Button,} from '@heroui/react'
 import { Upload, FolderPlus, LoaderCircle } from 'lucide-react'
-import React, { useState } from 'react'
+import React, {  useState } from 'react'
 import axios from 'axios';
-import {useAuth,useUser} from '@clerk/nextjs';
+import {useUser} from '@clerk/nextjs';
 import { useFolderModal } from '@/lib/state';
 import useSWR, { mutate } from 'swr';
 import {fetcher} from '@/lib/fetcher';
-import {useCurrentParent} from '@/lib/state';
 import { Trash,Folder , File, Star } from 'lucide-react';
-import Link from 'next/link';
 import {useSearchParams,useRouter} from 'next/navigation';
 
 
 
 function All() {
     const [file,setFile] = useState<File | null>(null)
-    const [status,setStatus] = useState('idle')
-    const Auth = useAuth();
+    // const [status,setStatus] = useState('idle')
+    // const Auth = useAuth();
     const params = useSearchParams();
     const currentParent = params.get('parentId') || null;
     const router = useRouter()
@@ -35,8 +33,8 @@ function All() {
         }
     }
 
-    const {isOpen,toggle}:any = useFolderModal()
-    const {user,isLoaded,isSignedIn} = useUser()
+    const {toggle}:{toggle: ()=>void} = useFolderModal()
+    const {user} = useUser()
     // const [filesList,setFilesList] = useState([])
     const [isSubmitLoading,setIsSubmitLoading] = useState(false);
 
@@ -58,32 +56,35 @@ function All() {
     //     e.preventDefault()
     // }
 
-    const handleChange = (e:any)=>{
+    const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
 
         e.preventDefault()
-        const file = e.target.files[0]
+        const file = e.target?.files?.[0]
         if(!file) return
-        setStatus('ready')
+        // setStatus('ready')
 
         setFile(file)
         console.log(file)
         
     }
     
-    const handleSubmit = async (e:any)=>{
+    const handleSubmit = async ()=>{
+        if(!file) return
         setIsSubmitLoading(true);
         try{
 
             const formData = new FormData();
-            formData.append('file',file!);
-            formData.append('userId',user?.id!);
+            // @typescript-eslint/no-non-null-asserted-optional-chain
+            formData.append('file',file);
+            // @typescript-eslint/no-non-null-asserted-optional-chain
+            formData.append('userId',user?.id || '');
     
             if(currentParent) {
                 console.log('parentId fORMdATA :',currentParent)
                 formData.append('parentId',currentParent)
             }
     
-            const response = await axios.post('/api/files/upload',formData
+            await axios.post('/api/files/upload',formData
             //     ,{
             //         headers:{
             //             Authorization : `Bearer ${token.split('_')[1]}`
@@ -92,7 +93,6 @@ function All() {
             )
     
     
-            console.log('response : ',response)
             setFile(null);
 
         }catch(e){
@@ -114,7 +114,7 @@ function All() {
     const handleStar = async (fileId:string)=>{
         try{
             setIsSubmitLoading(true)
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/files/${fileId}/star`
             )
             await mutate('http://localhost:3000/api/files/')
@@ -130,7 +130,7 @@ function All() {
         try{
 
             setIsSubmitLoading(true)
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/files/${fileId}/trash`
             )
             await mutate('http://localhost:3000/api/files/')
@@ -151,7 +151,7 @@ function All() {
             </h1>
             <Divider />
             <div className="flex flex-row gap-6 my-2">
-                <Button className="flex flex-col  h-24 w-[35%] max-w-[320px] items-start border-gray-100 rounded-sm  border-1  hover:shadow-md  shadow-[#666] hover:bg-[#55555555] " onClick={(e)=>toggle()}>
+                <Button className="flex flex-col  h-24 w-[35%] max-w-[320px] items-start border-gray-100 rounded-sm  border-1  hover:shadow-md  shadow-[#666] hover:bg-[#55555555] " onClick={()=>toggle()}>
                     <FolderPlus className="text-gray-400 w-8 h-8"/>
                     <p className="text-xl">
                         New Folder
@@ -177,7 +177,7 @@ function All() {
                     onChange={handleChange}
                     />
                     <Button
-                    className="bg-blue-500/60 hover:bg-blue-500/85 hover:font-bold w-[30%] flex items-center h-full border-l-1 " isIconOnly isDisabled={file==null} onClick={handleSubmit}
+                    className="bg-blue-500/60 hover:bg-blue-500/85 hover:font-bold w-[30%] flex items-center h-full border-l-1 " isIconOnly isDisabled={file==null} onClick={()=>handleSubmit()}
                     >
                         <Upload className="text-white font-semibold w-8 h-8"/>
                     </Button>
@@ -210,13 +210,13 @@ function All() {
                 {
                     data ? 
                     <div className="flex flex-row items-center gap-0">
-                    <Button className="text-white text-md font-extralight  px-1 mx-0 pl-1 border-b border-transparent hover:border-b hover:border-gray-400 hover:bg-gray-300/5 rounded-sm" onClick={e=>{setCurrentParent(null)}}>
+                    <Button className="text-white text-md font-extralight  px-1 mx-0 pl-1 border-b border-transparent hover:border-b hover:border-gray-400 hover:bg-gray-300/5 rounded-sm" onClick={()=>{setCurrentParent(null)}}>
                         /home
                     </Button>
 
                     {
-                        data?.parents?.toReversed().map((parent:any)=>(
-                            <Button className="text-white text-md font-extralight  px-1 mx-0 pl-1 border-b border-transparent hover:border-b hover:border-gray-400 hover:bg-gray-300/5 rounded-sm" onClick={e=>{setCurrentParent(parent.id)}} key={'navigation-'+parent.id}>
+                        data?.parents?.toReversed().map((parent:{id:string,name:string})=>(
+                            <Button className="text-white text-md font-extralight  px-1 mx-0 pl-1 border-b border-transparent hover:border-b hover:border-gray-400 hover:bg-gray-300/5 rounded-sm" onClick={()=>{setCurrentParent(parent.id)}} key={'navigation-'+parent.id}>
                                 /{parent.name}
                             </Button>
                         ))
@@ -241,18 +241,18 @@ function All() {
                 </span>
             )}
             {(!isLoading && !error && data?.result?.length>0 ) ? (<div className="flex flex-col gap-2">
-                {data.result.map((item:any) =>{
+                {data.result.map((item:{isFolder:boolean,id:string,name:string,isStarred:boolean,fileUrl:string}) =>{
                     if(item.isFolder) {
                         return (
-                            <div className="bg-gray-950/50 p-2 rounded-md border border-gray-400 flex justify-between items-center w-full cursor-default" key={item.id} onDoubleClick={e=>changeDirectory(item.id)}>
+                            <div className="bg-gray-950/50 p-2 rounded-md border border-gray-400 flex justify-between items-center w-full cursor-default" key={item.id} onDoubleClick={()=>changeDirectory(item.id)}>
                                 <div className="flex flex-row items-center gap-1">
                                     <Folder />
                                     {item.name}
                                 </div>
 
                                 <div className="flex flex-row gap-1">
-                                <Star  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `} fill={item.isStarred?' gold ':''} onClick={e=>handleStar(item.id)}/>
-                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={e=>handleTrash(item.id)}/>
+                                <Star  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `} fill={item.isStarred?' gold ':''} onClick={()=>handleStar(item.id)}/>
+                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={()=>handleTrash(item.id)}/>
                                 </div>
                             </div>
                         )

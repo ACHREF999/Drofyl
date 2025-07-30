@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest,NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import db from '@/lib'
 import {files, } from '@/lib/schema';
 import { and, count, eq, sum } from 'drizzle-orm';
@@ -19,9 +19,9 @@ function getFileType(fileName: string): 'image' | 'video' | 'document' | 'other'
 }
 
 
-export async function GET(request:NextRequest){
+export async function GET(){
     try{
-        console.log('\n\n\ndashboard route \n\n\n')
+        // console.log('\n\n\ndashboard route \n\n\n')
         // we get the total size 
         const user = await auth()
         

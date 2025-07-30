@@ -1,7 +1,7 @@
 'use client'
 import {useState} from 'react'
-import { useFolderModal ,useCurrentParent} from '@/lib/state'
-import {Button, Divider,Input} from '@heroui/react';
+import { FolderModalState, useFolderModal } from '@/lib/state'
+import {Button, Divider} from '@heroui/react';
 import { X } from 'lucide-react';
 import axios from 'axios'
 import { useUser } from '@clerk/nextjs';
@@ -9,17 +9,17 @@ import { mutate } from 'swr';
 import { useSearchParams } from 'next/navigation';
 
 function FolderModal() {
-  const {isOpen,toggle}:any = useFolderModal()
+  const {isOpen,toggle}:FolderModalState = useFolderModal()
   // const {currentParent,currentPath} : any = useCurrentParent()
   const [isLoading,setIsLoading] = useState(false)
   const [folderName,setFolderName]= useState('')
-  const {user,isLoaded,isSignedIn} = useUser()
+  const {user} = useUser()
   const params = useSearchParams()
   const currentParent = params.get('parentId') || null
   const [formError,setFormError] = useState(false)
 
 
-  const handleSubmit = async( e :any) =>{
+  const handleSubmit = async( ) =>{
     if(!folderName) {
       setFormError(true)
       return
@@ -28,7 +28,7 @@ function FolderModal() {
     setIsLoading(true)
     try { 
       
-      const response = await axios.post('/api/folders/create',{
+      await axios.post('/api/folders/create',{
         name:folderName,
         parentId:currentParent,
         userId:user?.id
@@ -37,14 +37,14 @@ function FolderModal() {
       setFolderName('')
       toggle()
     }catch(err){
-
+      console.log(err)
     }finally{
       setIsLoading(false)
     }
   }
 
   return (
-    <div className={`${isOpen?'absolute ':'hidden '} h-[100vh] w-[100vw] bg-slate-700/50 top-0 left-0 flex flex-col items-center justify-center  `} onClick={(e)=>toggle()}>
+    <div className={`${isOpen?'absolute ':'hidden '} h-[100vh] w-[100vw] bg-slate-700/50 top-0 left-0 flex flex-col items-center justify-center  `} onClick={()=>toggle()}>
       <div className={isLoading?`absolute w-full h-full top-0 left-0 bg-black/10 z-10`:''} onClick={(e)=>{e.stopPropagation()}} onDoubleClick={(e)=>{e.stopPropagation()}}>
             
           </div>
@@ -56,7 +56,7 @@ function FolderModal() {
               Create Folder
             </h1>
 
-            <Button className="text-gray-400 w-8 h-8" isIconOnly onClick={(e)=>toggle()} > 
+            <Button className="text-gray-400 w-8 h-8" isIconOnly onClick={()=>toggle()} > 
                 <X/>
             </Button>
 

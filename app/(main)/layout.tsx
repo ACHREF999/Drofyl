@@ -1,5 +1,4 @@
 import SideBar from "@/components/SideBar";
-import { useUser } from "@clerk/nextjs";
 import IsAuth from '@/components/IsAuth';
 
 

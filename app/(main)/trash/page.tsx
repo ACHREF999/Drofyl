@@ -15,15 +15,15 @@ function Trashed() {
     const [isLoading,setIsLoading] = useState(false);
 
 
-    const onDoubleClick = (isFolder:boolean)=>{
-        alert(`YOU CANT UNTIL U RESTORE THE ${isFolder ? 'Folder' : 'File' } `)
-    }
+    // const onDoubleClick = (isFolder:boolean)=>{
+    //     alert(`YOU CANT UNTIL U RESTORE THE ${isFolder ? 'Folder' : 'File' } `)
+    // }
 
     const handleDelete = async (fileId:string)=>{
         try{
             setIsLoading(true)
 
-            const response = await axios.delete(
+            await axios.delete(
                 `http://localhost:3000/api/files/${fileId}/delete`
             )
             const filterFunction = (key:string)=>{
@@ -47,7 +47,7 @@ function Trashed() {
         try{
             setIsLoading(true)
 
-            const response = await axios.patch(
+            await axios.patch(
                 `http://localhost:3000/api/files/${fileId}/trash`
             )
             const filterFunction = (key:string)=>{
@@ -96,7 +96,7 @@ function Trashed() {
                 </span>
             )}
             {(!isDataLoading && !error && data?.result?.length>0 ) ? (<div className="flex flex-col gap-2">
-                {data.result.map((item:any) =>{
+                {data.result.map((item:{id:string,name:string,fileUrl:string,isFolder:boolean,isStarred:boolean,isDeleted:boolean}) =>{
                     if(item.isFolder) {
                         return (
                             <div className="bg-gray-950/50 p-2 rounded-md border border-gray-400 flex justify-between items-center w-full" key={item.id} >
@@ -106,8 +106,8 @@ function Trashed() {
                                 </div>
 
                                 <div className="flex flex-row gap-1">
-                                <Undo2  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `}  onClick={e=>handleTrash(item.id)}/>
-                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={e=>handleDelete(item.id)} fill={item.isDeleted?' red ':''}/>
+                                <Undo2  className={`${item.isStarred ?'text-gray-300 ': 'text-gray-500'}  hover:text-gray-200 `}  onClick={()=>handleTrash(item.id)}/>
+                                <Trash  className="text-gray-500  hover:text-gray-200" onClick={()=>handleDelete(item.id)} fill={item.isDeleted?' red ':''}/>
                                 </div>
                             </div>
                         )
@@ -121,7 +121,7 @@ function Trashed() {
                             </div>
 
                             <div className="flex flex-row gap-1">
-                                <Undo2  className="text-gray-500  hover:text-gray-200" onClick={e=>handleDelete(item.id)}/>
+                                <Undo2  className="text-gray-500  hover:text-gray-200" onClick={()=>handleDelete(item.id)}/>
                                 <Trash  className="text-gray-500  hover:text-gray-200" fill={item.isDeleted?' red ':''}/>
                             </div>
                         </a>

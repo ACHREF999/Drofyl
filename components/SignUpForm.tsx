@@ -9,7 +9,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {signUpSchema} from '@/zod_schema/signUpSchema'
 import {useState} from 'react'
 import {useRouter} from 'next/navigation'
-import {Card,CardHeader,CardBody,Divider,Input,Button, CardFooter} from '@heroui/react';
+import {Card,CardHeader,CardBody,Divider,Button, CardFooter} from '@heroui/react';
 import {Mail,Lock,EyeOff,Eye,CheckCircle} from 'lucide-react'
 
 export default function SignUpForm(){
@@ -18,8 +18,8 @@ export default function SignUpForm(){
     const {signUp , isLoaded  , setActive } = useSignUp()
     const [isVerifying , setIsVerifying] = useState(false)
     const [isSubmitting , setIsSubmitting] = useState(false)
-    const [authError , setAuthError] = useState<any >(null)
-    const [verificationError,setVerificationError] = useState(null)
+    const [authError , setAuthError] = useState<null|string[] >(null)
+    const [verificationError,setVerificationError] = useState<string|null>(null)
     const [OTPCode,setOTPCode] = useState("")
     const [email,setEmail] = useState("")
     const [showPassword,setShowPassword] = useState(false)
@@ -27,7 +27,6 @@ export default function SignUpForm(){
     const {
         register , 
         handleSubmit,
-        watch,
         formState:{errors},
     } = useForm<z.infer<typeof signUpSchema>>({
         resolver : zodResolver(signUpSchema),
@@ -59,12 +58,12 @@ export default function SignUpForm(){
                 strategy:"email_code"
             })
             setIsVerifying(true)
-        }catch(e:any){
+        }catch(e){
             // console.error(e)
             setAuthError(
                 // e.errors?.[0]?.message 
-                e.errors.map((item:any)=>item.message+' \n ') 
-                || "an error occured"
+                
+                [`an error occured : ${e}`] 
             )
             
         }finally {
@@ -99,9 +98,9 @@ export default function SignUpForm(){
         else { 
             console.log("Result Status is : ",result.status)
         }
-        }catch(e:any){
+        }catch(e){
             console.error("Verification Failed")
-            setVerificationError(e.errors?.[0]?.message|| "Verification Error")
+            setVerificationError(`Verification Error ${e}`)
             
         }finally{
             setIsSubmitting(false)
@@ -161,7 +160,7 @@ export default function SignUpForm(){
                     {/* No OTP Code Recieved */}
                     <CardFooter className="flex justify-center py-4">
                         <p className="text-sm text-default-600">
-                            Didn't recieve OTP code ?{" "}
+                            Didn&apos;t recieve OTP code ?{" "}
                             <button 
                                 onClick= {async()=>{
                                     if(signUp) {
@@ -222,7 +221,7 @@ export default function SignUpForm(){
             <CardBody>
                 {authError && (
                     <div className="text-danger-700 bg-danger-50 p-4 flex">
-                        <p>{authError.map((message:string)=>(<span className="text-red-700/80 text-sm block "> - {message}</span>))}</p>
+                        <p>{authError.map((message:string)=>(<span className="text-red-700/80 text-sm block " key={message}> - {message}</span>))}</p>
                     </div>
                 )}
                 {/* the use form is like a wraper that bridges data collection from the form */}

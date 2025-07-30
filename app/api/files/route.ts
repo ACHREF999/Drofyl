@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         // is the parentId valid ? 
         
         let result ; 
-        let parents = [];
+        const parents = [];
         if (parentId){
             const [parent]  = await db.select().from(files).where(
                 and(

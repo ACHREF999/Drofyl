@@ -9,7 +9,7 @@ import {useState} from 'react'
 import Link from 'next/link'
 
 
-import {Card, CardHeader,CardBody,CardFooter,Divider,Input,Button} from '@heroui/react';
+import {Card, CardHeader,CardBody,CardFooter,Divider,Button} from '@heroui/react';
 import {Mail,Lock,Eye,EyeOff} from 'lucide-react';
 
 
@@ -24,7 +24,6 @@ export default function SignInForm() {
     const {
         register,
         handleSubmit,
-        watch,
         formState : {errors}
     } = useForm({
         resolver : zodResolver(signInSchema),
@@ -56,8 +55,8 @@ export default function SignInForm() {
             setAuthError("Result Status Error")
         }
 
-    }catch(e:any){
-        setAuthError(e.errors?.[0]?.message || `An error Occured : ${e}`)
+    }catch(e){
+        setAuthError( `An error Occured : ${e}`)
     }finally{
         setIsSubmitting(false)
     }
@@ -158,7 +157,7 @@ export default function SignInForm() {
 
             <CardFooter className="flex justify-center py-4">
                 <p className="text-sm text-default-600">
-                    Don't have an account ? {" "}
+                    Don&apos;t have an account ? {" "}
                     <Link
                         href = "/sign-up"
                         className="text-primary hover:underline font-medium"

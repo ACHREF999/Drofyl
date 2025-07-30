@@ -1,7 +1,7 @@
 'use client'
 
-import {useState} from 'react'
-import {Divider, Input,Button} from '@heroui/react';
+import React, {useState} from 'react'
+import {Divider, Button} from '@heroui/react';
 import { useUser,useClerk } from '@clerk/nextjs';
 import Image from 'next/image';
 import {Check, CircleX, Pen} from 'lucide-react';
@@ -9,7 +9,7 @@ import {Check, CircleX, Pen} from 'lucide-react';
 
 
 function Profile() {
-    const {user,isLoaded,isSignedIn} = useUser()
+    const {user} = useUser()
     const [updateUserParams,setUpdateUserParams] = useState({
         username:user?.username,
         firstName:user?.firstName,
@@ -19,7 +19,7 @@ function Profile() {
     
     const [isLoading,setIsLoading] = useState(false)
 
-    const handleChange =  (e:any)=>{
+    const handleChange =  (e:React.ChangeEvent<HTMLInputElement>)=>{
         setUpdateUserParams({
             ...updateUserParams,
             [e.target.name]:e.target.value
@@ -27,13 +27,17 @@ function Profile() {
 
     }
 
-    const handleSubmit = async (e:any)=>{
-        e.preventDefault()
+    const handleSubmit = async ()=>{
         setIsLoading(true)
         try{
 
             console.log(updateUserParams)
-            const updateData :any = {}
+            const updateData :{
+                username:string|undefined,
+                firstName:string|undefined,
+                lastName:string|undefined,
+
+            } = {firstName:undefined,lastName:undefined,username:undefined}
             if(updateUserParams.username ){
                 updateData.username = updateUserParams.username
             }
@@ -56,25 +60,24 @@ function Profile() {
 
     }
     
-    const handleImageUpload = async (e:any)=>{
+    const handleImageUpload = async (e:React.ChangeEvent<HTMLInputElement>)=>{
         e.preventDefault()
-        const file = e.target.files[0] 
+        const file = e?.target?.files?.[0] || null 
         if(!file) return;
         try{
 
             setIsLoading(true)
-            const response = await user?.setProfileImage({file})
+            await user?.setProfileImage({file})
             // await user.updateUserProfileImage(file)
             await user?.reload()
             
         }catch(e){ 
-            
+            console.log(e)
         }finally{
             setIsLoading(false)
         }
     }
-    const logout = (e:any)=> {
-        e.preventDefault()
+    const logout = ()=> {
         signOut({redirectUrl:'/'})
     }
     return (
@@ -141,7 +144,7 @@ function Profile() {
         <Button
             type="submit"
             className="bg-white rounded-md p-1 text-black hover:bg-[#eee]" 
-            onClick={handleSubmit}
+            onClick={()=>{handleSubmit()}}
             isLoading={isLoading}
         >
             Save Changes
@@ -201,7 +204,7 @@ function Profile() {
         </div>
 
         <div className="self-center justify-self-center">
-                    <Button className="bg-red-600/50  px-4 py-2 rounded-sm mt-12" onClick={logout}>
+                    <Button className="bg-red-600/50  px-4 py-2 rounded-sm mt-12" onClick={()=>logout}>
                         LogOut
                     </Button>
         </div>

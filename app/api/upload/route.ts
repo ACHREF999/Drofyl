@@ -1,8 +1,8 @@
 import {auth} from '@clerk/nextjs/server'
 import db from '@/lib'
-import {files, File} from '@/lib/schema'
+import {files} from '@/lib/schema'
 import {NextRequest,NextResponse} from 'next/server';
-import {and , eq} from 'drizzle-orm';
+import { and, eq, InferModel } from 'drizzle-orm';
 
 
 export async function POST(request:NextRequest){
@@ -33,6 +33,12 @@ export async function POST(request:NextRequest){
                     eq(files.isFolder,true)
                 )
             )
+            if(!parent){
+                throw new Error('INVALID ParentId')
+            }
+        }
+        if(!parent){
+            throw new Error('INVALID ParentId')
         }
         
         const fileData = {
@@ -49,12 +55,12 @@ export async function POST(request:NextRequest){
             isDeleted : false,
         }
 
-        const [newFile] = await db.insert(files).values(fileData as any).returning()
+        const [newFile] = await db.insert(files).values(fileData as InferModel<typeof files>).returning()
         console.log('file upload successfull')
         return NextResponse.json({newFile},{status:201})
 
     }catch(e){
-        return NextResponse.json({error:'Failed to save file info to db'},{status : 500})
+        return NextResponse.json({error:`Failed to save file info to db : ${e}`},{status : 500})
     }
 }
 

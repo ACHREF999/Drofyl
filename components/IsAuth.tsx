@@ -16,6 +16,9 @@ function IsAuth({children}:{children:React.ReactNode}) {
     if (isLoaded && !isSignedIn) {
         router.push('/sign-in')
     }
+    if(!user ){
+        router.push('/sign-in')
+    }
     return (
         <>
             {children}
